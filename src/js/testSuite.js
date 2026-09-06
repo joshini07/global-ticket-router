@@ -128,7 +128,7 @@ export const TEST_CASES = [
     title: 'Dynamic Confidence Threshold Adjustment',
     description: 'Verifies that setting a higher threshold (e.g. 95%) forces medium-confidence tickets into Manual Review.',
     input: {
-      text: 'Wireless network connection drops intermittently in conference room.',
+      text: 'Intermittent network latency observed in conference room.',
       region: 'APAC',
       channel: 'Portal',
       asset: 'Network/VPN',
