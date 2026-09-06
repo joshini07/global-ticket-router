@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Ticket Router — Smart Support Ticket Routing Engine</title>
+  <meta name="description" content="AI & Rules-based Global Ticket Router eliminating regional support ticket bouncing with confidence scoring, constraints, and audit trails.">
+  <link rel="stylesheet" href="./src/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-inner">
+      <div class="logo-group">
+        <div class="logo-icon">🔀</div>
+        <div class="logo-text">
+          <h1>Global Ticket Router</h1>
+          <p>Context-Aware Regional Support Ticket Routing Engine</p>
+        </div>
+      </div>
+      <div class="header-controls">
+        <div class="threshold-box">
+          <span class="threshold-label">Confidence Threshold:</span>
+          <span class="threshold-val" id="thresholdDisplay">70%</span>
+          <input type="range" id="thresholdSlider" class="threshold-slider" min="40" max="95" step="5" value="70" title="Adjust Confidence Threshold">
+        </div>
+        <button id="btnResetData" class="btn btn-secondary btn-sm" title="Reset to default seed data">⚡ Reset Data</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Top Key Metrics Banner -->
+    <section class="stats-banner">
+      <div class="stat-card accent-cyan">
+        <div class="stat-title">Total Tickets Processed</div>
+        <div class="stat-value" id="statTotalTickets">0</div>
+        <div class="stat-subtext">Across all global regions</div>
+      </div>
+      <div class="stat-card accent-emerald">
+        <div class="stat-title">Auto-Routed Tickets</div>
+        <div class="stat-value" id="statAutoRouted">0</div>
+        <div class="stat-subtext">High confidence ($\ge$ Threshold)</div>
+      </div>
+      <div class="stat-card accent-amber">
+        <div class="stat-title">Manual Review Queue</div>
+        <div class="stat-value" id="statManualReview">0</div>
+        <div class="stat-subtext">Low confidence or constraint flag</div>
+      </div>
+      <div class="stat-card accent-violet">
+        <div class="stat-title">First-Assignment Accuracy</div>
+        <div class="stat-value" id="statAccuracy">0%</div>
+        <div class="stat-subtext">Correct initial resolver target</div>
+      </div>
+      <div class="stat-card accent-cyan">
+        <div class="stat-title">Ticket Bounce Reduction</div>
+        <div class="stat-value" id="statBounceReduction">0%</div>
+        <div class="stat-subtext">vs 42% industry baseline</div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="tabSubmit">📥 Submit Ticket & Route</button>
+      <button class="tab-btn" data-tab="tabManual">📋 Manual Review <span class="badge-count" id="badgeManualCount">0</span></button>
+      <button class="tab-btn" data-tab="tabAudit">📜 Audit Trail</button>
+      <button class="tab-btn" data-tab="tabAnalytics">📊 Analytics & Metrics</button>
+      <button class="tab-btn" data-tab="tabRules">⚙️ Hard & Soft Rules</button>
+      <button class="tab-btn" data-tab="tabTests">🧪 Interactive Test Suite</button>
+    </nav>
+
+    <!-- Tab 1: Submit Ticket -->
+    <section id="tabSubmit" class="tab-pane active">
+      <div class="grid-2col">
+        <!-- Form Left -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">📝 Ticket Submission Form</h2>
+          </div>
+          <form id="ticketForm">
+            <div class="form-group">
+              <label class="form-label" for="ticketText">Ticket Text / Problem Description *</label>
+              <textarea id="ticketText" class="form-textarea" required placeholder="Describe the operational issue (e.g. My Macbook screen is flickering constantly after macOS update in London office...)"></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="ticketRegion">Region *</label>
+                <select id="ticketRegion" class="form-select" required>
+                  <option value="NA">North America (NA)</option>
+                  <option value="EMEA">Europe & Middle East (EMEA)</option>
+                  <option value="APAC">Asia-Pacific (APAC)</option>
+                  <option value="LATAM">Latin America (LATAM)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="ticketChannel">Support Channel *</label>
+                <select id="ticketChannel" class="form-select" required>
+                  <option value="Portal">Self-Service Portal</option>
+                  <option value="Email">Support Email</option>
+                  <option value="Slack/Chat">Slack / Teams Chat</option>
+                  <option value="Phone">Hotline Phone Call</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="ticketAsset">Asset / Affected System *</label>
+                <select id="ticketAsset" class="form-select" required>
+                  <option value="Hardware">Hardware (Laptop, Monitor, Peripheral)</option>
+                  <option value="Software/ERP">Software / ERP System (SAP, Salesforce)</option>
+                  <option value="Network/VPN">Network / VPN (Cisco, Wi-Fi)</option>
+                  <option value="Identity/IAM">Identity / IAM (Okta, Password, SSO)</option>
+                  <option value="Finance System">Finance System (Payroll, Expense)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="ticketRole">User Role *</label>
+                <select id="ticketRole" class="form-select" required>
+                  <option value="End User">End User / Employee</option>
+                  <option value="Tier 1 Agent">Tier 1 Support Agent</option>
+                  <option value="Support Lead / Admin">Support Lead / Admin</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 10px;">
+              <button type="submit" class="btn btn-primary" style="flex: 1;">⚡ Evaluate & Route Ticket</button>
+              <button type="button" id="btnFillPreset" class="btn btn-secondary" title="Fill with sample ticket">✨ Fill Preset</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Result Card Right -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">🔍 Live Routing Recommendation Result</h2>
+              <span id="liveStatusBadge" class="badge badge-auto">READY</span>
+            </div>
+
+            <div id="liveResultContainer">
+              <div class="empty-state">
+                <div class="empty-icon">🔀</div>
+                <p>Fill out the support ticket form and click <strong>Evaluate & Route Ticket</strong> to test real-time intent classification, constraints evaluation, and group routing.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 2: Manual Review Queue -->
+    <section id="tabManual" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">📋 Manual Review Triage Queue</h2>
+            <p class="card-description">Tickets with low confidence (&lt; <span id="manualThresholdLabel">70</span>%) or flagged by rules requiring human triage before final assignment.</p>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Description</th>
+                <th>Region & Asset</th>
+                <th>Intent Identified</th>
+                <th>Confidence</th>
+                <th>Current Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="manualReviewTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Audit Trail -->
+    <section id="tabAudit" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">📜 System Audit Trail & Assignment History</h2>
+            <p class="card-description">Immutable event log tracking initial recommendations, rule triggers, user overrides, and final target resolver groups.</p>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Ticket ID</th>
+                <th>Action</th>
+                <th>Actor</th>
+                <th>Previous Group</th>
+                <th>Target Resolver Group</th>
+                <th>Reason & Notes</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 4: Analytics Dashboard -->
+    <section id="tabAnalytics" class="tab-pane">
+      <div class="grid-2col">
+        <div class="card">
+          <h2 class="card-title" style="margin-bottom: 16px;">📈 Routing Status Breakdown</h2>
+          <div id="statusBreakdownContainer">
+            <!-- Dynamic visual bars rendered via JS -->
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title" style="margin-bottom: 16px;">🌍 Ticket Volume by Region</h2>
+          <div id="regionBreakdownContainer">
+            <!-- Dynamic visual bars rendered via JS -->
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title" style="margin-bottom: 16px;">🎯 Top Detected Ticket Intents</h2>
+        <div id="intentBreakdownContainer">
+          <!-- Dynamic bars rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 5: Hard & Soft Rules Config -->
+    <section id="tabRules" class="tab-pane">
+      <div class="card">
+        <h2 class="card-title" style="margin-bottom: 12px;">🛡️ Active Hard Constraints (Mandatory Rules)</h2>
+        <p class="card-description" style="margin-bottom: 20px;">Hard constraints strictly enforce regulatory compliance, security policies, and data sovereignty. They override standard keyword confidence matching.</p>
+        
+        <div id="hardRulesList">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title" style="margin-bottom: 12px;">💡 Active Soft Constraints (Optimization Heuristics)</h2>
+        <p class="card-description" style="margin-bottom: 20px;">Soft constraints adjust scoring based on local team affinity, channel urgency, and user authority role.</p>
+
+        <div id="softRulesList">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 6: Test Suite -->
+    <section id="tabTests" class="tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">🧪 Interactive Automated Test Suite</h2>
+            <p class="card-description">Execute 8 pre-configured test scenarios to verify confidence scoring, constraint overrides, manual review triggers, and audit logging.</p>
+          </div>
+          <button id="btnRunTests" class="btn btn-primary">▶️ Run All 8 Test Scenarios</button>
+        </div>
+
+        <div id="testSuiteSummary" style="margin-bottom: 20px; display: none;">
+          <!-- Test summary alert rendered via JS -->
+        </div>
+
+        <div id="testResultsContainer">
+          <div class="empty-state">
+            <div class="empty-icon">🧪</div>
+            <p>Click <strong>Run All 8 Test Scenarios</strong> to execute test cases and verify system accuracy.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Override Modal Dialog -->
+  <div id="overrideModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Manual Ticket Override</h3>
+        <button class="close-btn" id="btnCloseModal">&times;</button>
+      </div>
+      <form id="overrideForm">
+        <input type="hidden" id="overrideTicketId">
+        <div class="form-group">
+          <label class="form-label">Ticket Details</label>
+          <div id="overrideTicketInfo" style="font-size: 13px; color: var(--text-secondary); background: var(--bg-input); padding: 10px; border-radius: var(--radius-sm); margin-bottom: 12px;"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="overrideTargetGroup">Assign to Resolver Group *</label>
+          <select id="overrideTargetGroup" class="form-select" required>
+            <!-- Options populated dynamically -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="overrideReason">Override Justification / Reason *</label>
+          <textarea id="overrideReason" class="form-textarea" required style="min-height: 80px;" placeholder="Provide justification for reassigning this ticket..."></textarea>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;">
+          <button type="button" id="btnCancelOverride" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save & Record Override</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="./src/js/app.js"></script>
+</body>
+</html>
