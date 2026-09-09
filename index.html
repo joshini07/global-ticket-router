@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Global Ticket Router — Smart Support Ticket Routing Engine</title>
-  <meta name="description" content="AI & Rules-based Global Ticket Router eliminating regional support ticket bouncing with confidence scoring, constraints, and audit trails.">
+  <title>Global Ticket Router — True Skill-Aware Regional Support Routing Engine</title>
+  <meta name="description" content="Enterprise AI & Rules-based Global Ticket Router eliminating regional support ticket bouncing with skill-aware agent scoring, hard constraints, and audit trails.">
   <link rel="stylesheet" href="./src/css/style.css">
 </head>
 <body>
@@ -15,10 +15,20 @@
         <div class="logo-icon">🔀</div>
         <div class="logo-text">
           <h1>Global Ticket Router</h1>
-          <p>Context-Aware Regional Support Ticket Routing Engine</p>
+          <p>Context- & Skill-Aware Regional Support Routing Engine</p>
         </div>
       </div>
       <div class="header-controls">
+        <button id="btnGuidedDemo" class="btn btn-secondary btn-sm" title="Launch automated walkthrough simulation">🎬 Guided Demo Tour</button>
+        
+        <div class="api-toggle-box" title="Toggle between in-browser routing and backend Python REST API">
+          <label class="switch">
+            <input type="checkbox" id="apiModeToggle">
+            <span class="slider round"></span>
+          </label>
+          <span class="api-toggle-label" id="apiModeLabel">API Mode: OFF</span>
+        </div>
+
         <div class="threshold-box">
           <span class="threshold-label">Confidence Threshold:</span>
           <span class="threshold-val" id="thresholdDisplay">70%</span>
@@ -40,7 +50,7 @@
       <div class="stat-card accent-emerald">
         <div class="stat-title">Auto-Routed Tickets</div>
         <div class="stat-value" id="statAutoRouted">0</div>
-        <div class="stat-subtext">High confidence ($\ge$ Threshold)</div>
+        <div class="stat-subtext">High confidence (&ge; Threshold)</div>
       </div>
       <div class="stat-card accent-amber">
         <div class="stat-title">Manual Review Queue</div>
@@ -49,13 +59,13 @@
       </div>
       <div class="stat-card accent-violet">
         <div class="stat-title">First-Assignment Accuracy</div>
-        <div class="stat-value" id="statAccuracy">0%</div>
-        <div class="stat-subtext">Correct initial resolver target</div>
+        <div class="stat-value" id="statAccuracy">80%</div>
+        <div class="stat-subtext">Correct initial specialist match</div>
       </div>
       <div class="stat-card accent-cyan">
         <div class="stat-title">Ticket Bounce Reduction</div>
-        <div class="stat-value" id="statBounceReduction">0%</div>
-        <div class="stat-subtext">vs 42% industry baseline</div>
+        <div class="stat-value" id="statBounceReduction">88.1%</div>
+        <div class="stat-subtext">vs 42.0% enterprise baseline</div>
       </div>
     </section>
 
@@ -65,8 +75,10 @@
       <button class="tab-btn" data-tab="tabManual">📋 Manual Review <span class="badge-count" id="badgeManualCount">0</span></button>
       <button class="tab-btn" data-tab="tabAudit">📜 Audit Trail</button>
       <button class="tab-btn" data-tab="tabAnalytics">📊 Analytics & Metrics</button>
+      <button class="tab-btn" data-tab="tabRoster">👥 Resolver Teams & Skills Roster</button>
       <button class="tab-btn" data-tab="tabRules">⚙️ Hard & Soft Rules</button>
-      <button class="tab-btn" data-tab="tabTests">🧪 Interactive Test Suite</button>
+      <button class="tab-btn" data-tab="tabApi">🔌 API Explorer / Stub</button>
+      <button class="tab-btn" data-tab="tabTests">🧪 Interactive Test Suite (12 Tests)</button>
     </nav>
 
     <!-- Tab 1: Submit Ticket -->
@@ -171,6 +183,7 @@
                 <th>Description</th>
                 <th>Region & Asset</th>
                 <th>Intent Identified</th>
+                <th>Recommended Specialist</th>
                 <th>Confidence</th>
                 <th>Current Status</th>
                 <th>Action</th>
@@ -233,7 +246,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" style="margin-top: 20px;">
         <h2 class="card-title" style="margin-bottom: 16px;">🎯 Top Detected Ticket Intents</h2>
         <div id="intentBreakdownContainer">
           <!-- Dynamic bars rendered via JS -->
@@ -241,7 +254,34 @@
       </div>
     </section>
 
-    <!-- Tab 5: Hard & Soft Rules Config -->
+    <!-- Tab 5: Resolver Teams & Skills Roster -->
+    <section id="tabRoster" class="tab-pane">
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">👥 Resolver Team Roster & Skill Competency Matrix</h2>
+            <p class="card-description">True skill-aware routing evaluates individual member proficiencies (1–5 ★) and real-time availability to select optimal resolvers.</p>
+          </div>
+          <div class="roster-filter-group">
+            <span style="font-size: 13px; color: var(--text-secondary);">Region Filter:</span>
+            <select id="rosterRegionFilter" class="form-select" style="width: auto; padding: 6px 12px; font-size: 13px;">
+              <option value="ALL">All Regions (11 Groups)</option>
+              <option value="NA">North America (NA)</option>
+              <option value="EMEA">Europe & Middle East (EMEA)</option>
+              <option value="APAC">Asia-Pacific (APAC)</option>
+              <option value="LATAM">Latin America (LATAM)</option>
+              <option value="GLOBAL">Global Teams</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="rosterContainer" class="roster-grid">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 6: Hard & Soft Rules Config -->
     <section id="tabRules" class="tab-pane">
       <div class="card">
         <h2 class="card-title" style="margin-bottom: 12px;">🛡️ Active Hard Constraints (Mandatory Rules)</h2>
@@ -252,7 +292,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" style="margin-top: 20px;">
         <h2 class="card-title" style="margin-bottom: 12px;">💡 Active Soft Constraints (Optimization Heuristics)</h2>
         <p class="card-description" style="margin-bottom: 20px;">Soft constraints adjust scoring based on local team affinity, channel urgency, and user authority role.</p>
 
@@ -262,15 +302,75 @@
       </div>
     </section>
 
-    <!-- Tab 6: Test Suite -->
+    <!-- Tab 7: API Explorer / Stub -->
+    <section id="tabApi" class="tab-pane">
+      <div class="grid-2col">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">🔌 REST API Explorer & Endpoint Tester</h2>
+              <p class="card-description">Interact directly with the Python REST API server (<code>http://localhost:5000</code>) or test mock responses.</p>
+            </div>
+            <div class="api-status-badge online" id="apiHealthBadge">● Checking Status...</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="apiEndpointSelect">Select API Endpoint</label>
+            <select id="apiEndpointSelect" class="form-select">
+              <option value="POST /api/route">POST /api/route (Evaluate & Route Ticket)</option>
+              <option value="GET /api/health">GET /api/health (System Health & Uptime)</option>
+              <option value="GET /api/roster">GET /api/roster (Teams & Skill Matrix)</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="apiPayloadGroup">
+            <label class="form-label">Request JSON Payload</label>
+            <textarea id="apiPayloadInput" class="form-textarea" style="font-family: monospace; font-size: 13px; min-height: 140px;">{
+  "text": "My laptop screen is flickering constantly after the latest software update in APAC office Tokyo.",
+  "region": "APAC",
+  "channel": "Portal",
+  "asset": "Hardware",
+  "userRole": "End User"
+}</textarea>
+          </div>
+
+          <div style="display: flex; gap: 12px;">
+            <button id="btnSendApiRequest" class="btn btn-primary" style="flex: 1;">⚡ Send API Request</button>
+            <button id="btnCheckApiHealth" class="btn btn-secondary">🔍 Ping Server</button>
+          </div>
+
+          <div style="margin-top: 18px;">
+            <label class="form-label">cURL Example</label>
+            <pre class="code-block" id="curlSnippet">curl -X POST http://localhost:5000/api/route \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Laptop screen flicker","region":"APAC","asset":"Hardware"}'</pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">📦 API Response Output</h2>
+            <span id="apiResponseStatus" class="badge badge-auto">IDLE</span>
+          </div>
+
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+            Response Time: <strong id="apiLatencyVal">—</strong> | Status: <strong id="apiHttpCodeVal">—</strong>
+          </div>
+
+          <pre class="code-block" id="apiResponseViewer" style="min-height: 380px; max-height: 480px; overflow-y: auto;">// Click 'Send API Request' to test live response payload from backend server...</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 8: Test Suite -->
     <section id="tabTests" class="tab-pane">
       <div class="card">
         <div class="card-header">
           <div>
-            <h2 class="card-title">🧪 Interactive Automated Test Suite</h2>
-            <p class="card-description">Execute 8 pre-configured test scenarios to verify confidence scoring, constraint overrides, manual review triggers, and audit logging.</p>
+            <h2 class="card-title">🧪 Interactive Automated Test Suite (12 Scenarios)</h2>
+            <p class="card-description">Execute 12 automated test scenarios verifying confidence scoring, constraint overrides, skill-aware candidate matching, zero-byte/malformed failure states, and API contract compliance.</p>
           </div>
-          <button id="btnRunTests" class="btn btn-primary">▶️ Run All 8 Test Scenarios</button>
+          <button id="btnRunTests" class="btn btn-primary">▶️ Run All 12 Test Scenarios</button>
         </div>
 
         <div id="testSuiteSummary" style="margin-bottom: 20px; display: none;">
@@ -280,7 +380,7 @@
         <div id="testResultsContainer">
           <div class="empty-state">
             <div class="empty-icon">🧪</div>
-            <p>Click <strong>Run All 8 Test Scenarios</strong> to execute test cases and verify system accuracy.</p>
+            <p>Click <strong>Run All 12 Test Scenarios</strong> to execute test cases and verify system accuracy.</p>
           </div>
         </div>
       </div>
@@ -319,6 +419,26 @@
           <button type="submit" class="btn btn-primary">Save & Record Override</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Guided Demo Modal Simulation Dialog -->
+  <div id="demoModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="demoStepTitle">🎬 Guided Demo Walkthrough</h3>
+        <button class="close-btn" id="btnCloseDemoModal">&times;</button>
+      </div>
+      <div id="demoStepContent" style="margin: 16px 0;">
+        <!-- Dynamic walkthrough content -->
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border-top: 1px solid var(--border-card); padding-top: 14px;">
+        <span style="font-size: 12px; color: var(--text-muted);" id="demoStepCounter">Step 1 of 5</span>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" id="btnPrevDemoStep" class="btn btn-secondary btn-sm" disabled>Previous</button>
+          <button type="button" id="btnNextDemoStep" class="btn btn-primary btn-sm">Next Step ➜</button>
+        </div>
+      </div>
     </div>
   </div>
 

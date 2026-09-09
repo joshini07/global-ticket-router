@@ -173,6 +173,95 @@ export const TEST_CASES = [
         details: `Override Status: ${updated?.status}, Audit Entry Logged: ${passAudit ? 'YES' : 'NO'}`
       };
     }
+  },
+  {
+    id: 'TC-09',
+    title: 'Failure Edge: Zero-Byte / Empty Payload Handling',
+    description: 'Verifies that submitting a completely empty text payload is safely intercepted, does not crash, and routes to Manual Review queue.',
+    input: {
+      text: '',
+      region: 'NA',
+      channel: 'Portal',
+      asset: 'Hardware',
+      userRole: 'End User'
+    },
+    validate: (result) => {
+      const passStatus = result.status === 'MANUAL_REVIEW';
+      const passGroup = result.finalGroup === 'Manual-Review';
+      const passIntent = result.intent === 'UNKNOWN';
+      return {
+        passed: passStatus && passGroup && passIntent,
+        details: `Empty Input Handled: Status=${result.status}, Group=${result.finalGroup}, Intent=${result.intent}`
+      };
+    }
+  },
+  {
+    id: 'TC-10',
+    title: 'Failure Edge: Whitespace-Only Payload Handling',
+    description: 'Verifies that input consisting only of spaces, tabs, and newlines is treated as malformed and held in Manual Review.',
+    input: {
+      text: '   \n\t   \n   ',
+      region: 'EMEA',
+      channel: 'Email',
+      asset: 'Finance System',
+      userRole: 'End User'
+    },
+    validate: (result) => {
+      const passStatus = result.status === 'MANUAL_REVIEW';
+      const passGroup = result.finalGroup === 'Manual-Review';
+      return {
+        passed: passStatus && passGroup,
+        details: `Whitespace Input: Status=${result.status}, TargetGroup=${result.finalGroup}`
+      };
+    }
+  },
+  {
+    id: 'TC-11',
+    title: 'Skill-Aware Specialist Assignment & Availability Tiebreak',
+    description: 'Verifies that for an APAC hardware issue, the router scores candidates and selects Kenji Tanaka based on skill match (95%) and availability (95%).',
+    input: {
+      text: 'Dell laptop motherboard and BIOS firmware corrupted after reboot in APAC Tokyo office.',
+      region: 'APAC',
+      channel: 'Portal',
+      asset: 'Hardware',
+      userRole: 'End User'
+    },
+    validate: (result) => {
+      const passMember = result.bestMember === 'Kenji Tanaka';
+      const passSkillScore = result.skillMatchScore >= 90;
+      const passSkills = result.matchedSkills && result.matchedSkills.length > 0;
+      return {
+        passed: passMember && passSkillScore && passSkills,
+        details: `Assigned Specialist: ${result.bestMember} (Expected: Kenji Tanaka), Skill Match: ${result.skillMatchScore}%, Matched Skills Count: ${result.matchedSkills?.length}`
+      };
+    }
+  },
+  {
+    id: 'TC-12',
+    title: 'API & Integration Payload Contract Verification',
+    description: 'Verifies that the evaluated ticket contract contains all required fields: recommendedGroup, confidence, status, matchedSkills, hardConstraints, and assignedMember.',
+    input: {
+      text: 'Urgent: Phishing email attack targeting corporate SSO credentials in EMEA headquarters.',
+      region: 'EMEA',
+      channel: 'Phone',
+      asset: 'Identity/IAM',
+      userRole: 'Support Lead / Admin'
+    },
+    validate: (result) => {
+      const hasGroup = typeof result.recommendedGroup === 'string';
+      const hasConfidence = typeof result.confidence === 'number';
+      const hasStatus = typeof result.status === 'string';
+      const hasSkills = Array.isArray(result.matchedSkills);
+      const hasHardConstraints = Array.isArray(result.hardConstraintsApplied);
+      const hasMember = typeof result.bestMember === 'string';
+
+      const allPresent = hasGroup && hasConfidence && hasStatus && hasSkills && hasHardConstraints && hasMember;
+
+      return {
+        passed: allPresent,
+        details: `Contract Verification: recommendedGroup=${hasGroup}, confidence=${hasConfidence}, status=${hasStatus}, matchedSkills=${hasSkills}, hardConstraints=${hasHardConstraints}, assignedMember=${hasMember}`
+      };
+    }
   }
 ];
 
